@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi-Day Countdown Timer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #time {
+      font-size: 64px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    #labels {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 6px;
+      display: flex;
+      gap: 42px;
+    }
+
+    button {
+      margin: 12px 6px;
+      padding: 10px 18px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="time">00d 00h 00m 00s</div>
+  <div id="labels">
+    <span>DAYS</span>
+    <span>HOURS</span>
+    <span>MIN</span>
+    <span>SEC</span>
+  </div>
+
+  <div>
+    <button onclick="start()">Start</button>
+    <button onclick="pause()">Pause</button>
+    <button onclick="reset()">Reset</button>
+  </div>
+
+  <script>
+    /* =========================
+       CONFIGURATION
+       ========================= */
+
+    // Target end date/time (LOCAL TIME)
+    // Example: Jan 31, 2026 at 09:00
+    const TARGET_DATE = new Date("2026-02-13T09:00:00");
+
+    /* ========================= */
+
+    let interval = null;
+    let remainingMs = TARGET_DATE - new Date();
+
+    function format(ms) {
+      const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      return `${String(days).padStart(2, "0")}d `
+           + `${String(hours).padStart(2, "0")}h `
+           + `${String(minutes).padStart(2, "0")}m `
+           + `${String(seconds).padStart(2, "0")}s`;
+    }
+
+    function render() {
+      document.getElementById("time").textContent = format(remainingMs);
+    }
+
+    function tick() {
+      remainingMs -= 1000;
+      if (remainingMs <= 0) {
+        remainingMs = 0;
+        pause();
+      }
+      render();
+    }
+
+    function start() {
+      if (interval) return;
+      interval = setInterval(tick, 1000);
+    }
+
+    function pause() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    function reset() {
+      pause();
+      remainingMs = TARGET_DATE - new Date();
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
